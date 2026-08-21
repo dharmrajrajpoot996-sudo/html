@@ -1,0 +1,930 @@
+import os
+
+# Create HTML structure for a modern, presentation deck recreating the PDF contents
+html_content = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machine Learning Masterclass Presentation</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --accent-blue: #58a6ff;
+            --accent-cyan: #39c5bb;
+            --accent-purple: #bc8cff;
+            --text-main: #c9d1d9;
+            --text-heading: #ffffff;
+            --text-muted: #8b949e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .deck-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .slide {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .slide-header {
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .section-tag {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-cyan);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        h1, h2, h3 {
+            color: var(--text-heading);
+            font-weight: 600;
+        }
+
+        h1 { font-size: 2.5rem; }
+        h2 { font-size: 1.8rem; }
+        h3 { font-size: 1.2rem; color: var(--accent-blue); }
+
+        .slide-body {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .card {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .card-highlight {
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .slide-footer {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .img-container {
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .img-container img {
+            max-width: 100%;
+            height: auto;
+            max-height: 300px;
+            object-fit: cover;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: rgba(255,255,255,0.05);
+            color: var(--accent-blue);
+        }
+
+        .formula {
+            background-color: #000;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--accent-cyan);
+            text-align: center;
+            font-size: 1.1rem;
+            margin: 15px 0;
+        }
+
+        .quote-box {
+            font-style: italic;
+            font-size: 1.3rem;
+            border-left: 4px solid var(--accent-purple);
+            padding: 20px;
+            background: rgba(188, 140, 255, 0.05);
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+
+        .pipeline-step {
+            position: relative;
+            padding: 15px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .step-num {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-cyan);
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="deck-container">
+
+    <!-- Title Slide -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">MASTERCLASS SERIES</div>
+            <h1>Machine Learning</h1>
+            <p style="font-size: 1.3rem; color: var(--accent-blue);">Foundations & Applications</p>
+        </div>
+        <div class="slide-body" style="justify-content: center; text-align: center;">
+            <p style="font-size: 1.2rem; max-width: 800px; margin: 0 auto; color: var(--text-main);">
+                A comprehensive guide to statistical learning, neural networks, optimization, and modern production AI architectures.
+            </p>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 1</span>
+        </div>
+    </div>
+
+    <!-- Section 01 Header -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 01</div>
+            <h2>Foundations of Machine Learning</h2>
+        </div>
+        <div class="slide-body" style="justify-content: center;">
+            <p style="font-size: 1.4rem;">
+                Understanding how computer systems transition from explicit programming to learning autonomously from data.
+            </p>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 2</span>
+        </div>
+    </div>
+
+    <!-- What is Machine Learning -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 01 - FOUNDATIONS</div>
+            <h2>What is Machine Learning?</h2>
+        </div>
+        <div class="slide-body grid-2">
+            <div class="card">
+                <h3>Traditional Software</h3>
+                <p>In traditional programming, human developers write explicit rules and algorithms. Data is fed into these static rules to generate outputs and results.</p>
+                <p style="margin-top: 10px; color: var(--text-muted);">This approach fails when problems become too complex for humans to hand-craft exact logical steps, such as facial recognition or language translation.</p>
+            </div>
+            <div class="card card-highlight">
+                <h3>The ML Approach</h3>
+                <p>Machine Learning flips the paradigm. We feed both data and known correct outputs (labels) into the machine learning system during training.</p>
+                <p style="margin-top: 10px; color: var(--text-muted);">The algorithm infers the statistical patterns and generates its own program (model), capable of making accurate predictions on unseen data.</p>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 3</span>
+        </div>
+    </div>
+
+    <!-- Traditional Code vs ML -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 01 - FOUNDATIONS</div>
+            <h2>Traditional Code vs ML</h2>
+        </div>
+        <div class="slide-body grid-2">
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <div class="card">
+                    <strong>Explicit Logic Rule Limits:</strong> Traditional code requires explicit conditional logic for every scenario, becoming unmaintainable at scale.
+                </div>
+                <div class="card">
+                    <strong>Data-Driven Adaptation:</strong> Machine Learning automatically discovers complex mathematical relations directly from vast empirical datasets.
+                </div>
+                <div class="card">
+                    <strong>Continuous Improvement:</strong> ML models seamlessly update and adapt as new data streams into the training pipeline without code rewrites.
+                </div>
+                <div class="card">
+                    <strong>High-Dimensional Problem Solving:</strong> ML excels in non-linear, high-dimensional spaces like raw audio, vision, and contextual natural language.
+                </div>
+            </div>
+            <div class="img-container">
+                <img src="https://i.ytimg.com/vi/aircAruvnKk/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAEIAADIQJ0AgKJD&rs=AOn4CLBT2xhmZ8DGCLQI_4D5L0-k6rXpfQ" alt="Neural Network Visual">
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 4</span>
+        </div>
+    </div>
+
+    <!-- Core Machine Learning Paradigm -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 01 - FOUNDATIONS</div>
+            <h2>Core Machine Learning Paradigm</h2>
+        </div>
+        <div class="slide-body">
+            <h3>The Learning Feedback Loop</h3>
+            <p>At its core, machine learning relies on continuous optimization cycles:</p>
+            <div class="grid-4" style="margin-top: 20px;">
+                <div class="card">
+                    <div style="color: var(--accent-cyan); font-weight: bold;">01. Input Representation</div>
+                    <p style="font-size: 0.9rem; margin-top: 5px;">Vectorizing features into numeric arrays.</p>
+                </div>
+                <div class="card">
+                    <div style="color: var(--accent-cyan); font-weight: bold;">02. Hypothesis Generation</div>
+                    <p style="font-size: 0.9rem; margin-top: 5px;">Model computes probability outputs.</p>
+                </div>
+                <div class="card">
+                    <div style="color: var(--accent-cyan); font-weight: bold;">03. Loss Calculation</div>
+                    <p style="font-size: 0.9rem; margin-top: 5px;">Measuring error against ground truth.</p>
+                </div>
+                <div class="card">
+                    <div style="color: var(--accent-cyan); font-weight: bold;">04. Parameter Adjustment</div>
+                    <p style="font-size: 0.9rem; margin-top: 5px;">Updating weights to minimize error.</p>
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 5</span>
+        </div>
+    </div>
+
+    <!-- Three Main Pillars of ML -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 01 - FOUNDATIONS</div>
+            <h2>Three Main Pillars of ML</h2>
+        </div>
+        <div class="slide-body grid-3">
+            <div class="card card-highlight">
+                <h3>Supervised</h3>
+                <p>Models train on paired target labels. The system maps inputs to known targets via regression or classification algorithms.</p>
+            </div>
+            <div class="card card-highlight">
+                <h3>Unsupervised</h3>
+                <p>Models explore unlabeled data to uncover latent structures, hidden groupings, patterns, or lower dimensional embeddings.</p>
+            </div>
+            <div class="card card-highlight">
+                <h3>Reinforcement</h3>
+                <p>Agents learn optimal sequential strategies by interacting with dynamic environments through trial, error, and rewards.</p>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 6</span>
+        </div>
+    </div>
+
+    <!-- Section 02 Header -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 02</div>
+            <h2>Supervised Learning</h2>
+        </div>
+        <div class="slide-body" style="justify-content: center;">
+            <p style="font-size: 1.4rem;">
+                Mapping inputs to ground truth outputs through classification and regression architectures.
+            </p>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 7</span>
+        </div>
+    </div>
+
+    <!-- Supervised Learning Basics -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 02 - SUPERVISED LEARNING</div>
+            <h2>Supervised Learning Basics</h2>
+        </div>
+        <div class="slide-body grid-2">
+            <div class="card">
+                <h3>Classification Tasks</h3>
+                <p>Predicts discrete categorical labels for a given sample.</p>
+                <p style="margin-top: 10px; color: var(--text-muted);"><strong>Examples:</strong> Email spam detection (Binary: Spam/Not Spam), medical disease diagnosis, and image digit recognition (Multiclass: 0-9).</p>
+            </div>
+            <div class="card">
+                <h3>Regression Tasks</h3>
+                <p>Predicts continuous numerical values along a smooth real-valued spectrum.</p>
+                <p style="margin-top: 10px; color: var(--text-muted);"><strong>Examples:</strong> Real estate price valuation, stock volatility forecasting, temperature prediction, and sales demand estimates.</p>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 8</span>
+        </div>
+    </div>
+
+    <!-- Classification vs Regression & Performance -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 02 - SUPERVISED LEARNING</div>
+            <h2>Algorithm Performance Benchmarks</h2>
+        </div>
+        <div class="slide-body">
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                <div>Logistic Regression: <strong>88% Accuracy</strong></div>
+                <div>Decision Trees: <strong>82% Accuracy</strong></div>
+                <div>Random Forest: <strong>94% Accuracy</strong></div>
+                <div>Gradient Boosting: <strong>96% Accuracy</strong></div>
+            </div>
+            <div class="card">
+                <p>Ensemble algorithms (Random Forest, Gradient Boosting) consistently yield higher accuracy on structured benchmark datasets compared to single estimators.</p>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 9</span>
+        </div>
+    </div>
+
+    <!-- Popular Supervised Algorithms -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 02 - SUPERVISED LEARNING</div>
+            <h2>Popular Supervised Algorithms</h2>
+        </div>
+        <div class="slide-body grid-2">
+            <div class="card">
+                <strong>Linear & Logistic Regression:</strong> Fast, interpretable foundational baselines for continuous trends and binary decision boundaries.
+            </div>
+            <div class="card">
+                <strong>Support Vector Machines (SVM):</strong> Constructs optimal hyperplanes in high-dimensional spaces using kernel tricks.
+            </div>
+            <div class="card">
+                <strong>Decision Trees & Forests:</strong> Non-parametric hierarchical rule networks that capture non-linear relationships with high stability.
+            </div>
+            <div class="card">
+                <strong>XGBoost & LightGBM:</strong> Iterative gradient-boosted trees optimized for performance and competitive tabular data modeling.
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 10</span>
+        </div>
+    </div>
+
+    <!-- Section 03 Header -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 03</div>
+            <h2>Unsupervised Learning</h2>
+        </div>
+        <div class="slide-body" style="justify-content: center;">
+            <p style="font-size: 1.4rem;">
+                Extracting latent patterns, structures, and clusters without human-provided target labels.
+            </p>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 11</span>
+        </div>
+    </div>
+
+    <!-- Unsupervised Data Discovery -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 03 - UNSUPERVISED LEARNING</div>
+            <h2>Unsupervised Data Discovery</h2>
+        </div>
+        <div class="slide-body grid-2">
+            <div>
+                <h3>Extracting Invisible Signal</h3>
+                <p style="margin-top: 15px;">Unsupervised models scan raw multi-dimensional data to uncover hidden intrinsic structures.</p>
+                <p style="margin-top: 15px; color: var(--text-muted);">Because labeling datasets is expensive and time-consuming, unsupervised learning enables organizations to leverage massive volumes of raw data for anomaly detection, customer profiling, and feature selection.</p>
+            </div>
+            <div class="img-container">
+                <img src="https://continuinged.utah.edu/_resources/images/_cece/proed/content/bootcamps/bootcamps-datascience.webp" alt="Unsupervised Network">
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 12</span>
+        </div>
+    </div>
+
+    <!-- Clustering & Dimensionality -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 03 - UNSUPERVISED LEARNING</div>
+            <h2>Clustering & Dimensionality</h2>
+        </div>
+        <div class="slide-body grid-3">
+            <div class="card">
+                <h3>K-Means Clustering</h3>
+                <p>Partitions observations into K distinct centroid-based clusters by minimizing intra-cluster variance iteratively.</p>
+            </div>
+            <div class="card">
+                <h3>Hierarchical Clustering</h3>
+                <p>Builds nested trees of clusters (dendrograms) via agglomerative merging or divisive splitting strategies.</p>
+            </div>
+            <div class="card">
+                <h3>PCA Reduction</h3>
+                <p>Orthogonally transforms correlated features into linear orthogonal components capturing maximum variance.</p>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 13</span>
+        </div>
+    </div>
+
+    <!-- PCA Variance Reduction -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 03 - UNSUPERVISED LEARNING</div>
+            <h2>PCA Variance Reduction</h2>
+        </div>
+        <div class="slide-body" style="text-align: center; justify-content: center;">
+            <div style="font-size: 4rem; color: var(--accent-cyan); font-weight: bold;">95%</div>
+            <div style="font-size: 1.5rem; color: var(--text-heading); margin-bottom: 20px;">Variance Retained</div>
+            <p style="max-width: 700px; margin: 0 auto; color: var(--text-muted);">
+                Principal Component Analysis (PCA) can compress a 100-dimensional dataset down to just 12 orthogonal components while preserving over 95% of total dataset variance.
+            </p>
+            <p style="max-width: 700px; margin: 15px auto 0 auto;">
+                This drastically reduces computationally heavy model training times while eliminating multicollinearity and fighting the curse of dimensionality.
+            </p>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 14</span>
+        </div>
+    </div>
+
+    <!-- Section 04 Header -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 04</div>
+            <h2>Reinforcement Learning</h2>
+        </div>
+        <div class="slide-body" style="justify-content: center;">
+            <p style="font-size: 1.4rem;">
+                Sequential decision making through environment interaction, policy gradient strategies, and rewards.
+            </p>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 15</span>
+        </div>
+    </div>
+
+    <!-- Agents, States & Rewards -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 04 - REINFORCEMENT LEARNING</div>
+            <h2>Agents, States & Rewards</h2>
+        </div>
+        <div class="slide-body grid-2">
+            <div class="card card-highlight">
+                <h3>The RL Framework</h3>
+                <p>An Agent takes an Action within an Environment, transitioning the environment into a new State and receiving a scalar Reward.</p>
+                <p style="margin-top: 15px;">The core objective is learning a policy function mapping states to optimal actions to maximize cumulative long-term expected reward.</p>
+            </div>
+            <div class="card">
+                <h3>Key RL Applications</h3>
+                <ul style="padding-left: 20px; margin-top: 10px;">
+                    <li><strong>Autonomous Robotics:</strong> Learning complex locomotion and manipulation without manual programming.</li>
+                    <li style="margin-top: 10px;"><strong>Resource Optimization:</strong> Data center cooling, logistics routing, and automated stock trading strategies.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 16</span>
+        </div>
+    </div>
+
+    <!-- Bill Gates Quote -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 04 - REINFORCEMENT LEARNING</div>
+            <h2>Industry Perspective</h2>
+        </div>
+        <div class="slide-body grid-2" style="align-items: center;">
+            <div class="quote-box">
+                "A breakthrough in machine learning is worth ten microchip breakthroughs."
+                <div style="font-size: 1rem; color: var(--accent-cyan); font-style: normal; margin-top: 10px;">— Bill Gates</div>
+            </div>
+            <div class="img-container">
+                <img src="https://ik.imagekit.io/upgrad1/abroad-images/imageCompo/images/Gemini_Generated_Image_yynhdvyynhdvyynhVJ7L9N.jpg" alt="Computer Display">
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 17</span>
+        </div>
+    </div>
+
+    <!-- RLHF & Supervised Tuning -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 04 - REINFORCEMENT LEARNING</div>
+            <h2>The Human in the ML Loop</h2>
+        </div>
+        <div class="slide-body">
+            <h3>RLHF & Supervised Tuning</h3>
+            <p style="font-size: 1.1rem; margin-top: 15px;">Modern AI alignment techniques rely heavily on Reinforcement Learning from Human Feedback (RLHF).</p>
+            <div class="card" style="margin-top: 20px;">
+                Human annotators rank model output candidates. These rankings train a Reward Model, which guides policy optimization (e.g., PPO) to produce safe, helpful, and highly coherent generative responses.
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 18</span>
+        </div>
+    </div>
+
+    <!-- Section 05 Header -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 05</div>
+            <h2>Mathematical Core</h2>
+        </div>
+        <div class="slide-body" style="justify-content: center;">
+            <p style="font-size: 1.4rem;">
+                The mathematical principles driving algorithm convergence, linear algebra, calculus, and probability.
+            </p>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 19</span>
+        </div>
+    </div>
+
+    <!-- Essential Math Foundations -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 05 - MATHEMATICAL CORE</div>
+            <h2>Essential Math Foundations</h2>
+        </div>
+        <div class="slide-body grid-3">
+            <div class="card">
+                <h3>Linear Algebra</h3>
+                <p>Vectors, matrices, dot products, and tensor transformations represent features and neural weights efficiently.</p>
+            </div>
+            <div class="card">
+                <h3>Multivariate Calculus</h3>
+                <p>Partial derivatives, gradients, and Jacobians enable backpropagation through complex computational graphs.</p>
+            </div>
+            <div class="card">
+                <h3>Probability & Stats</h3>
+                <p>Bayes theorem, expectations, standard distributions, and hypothesis testing quantify uncertainty in predictions.</p>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 20</span>
+        </div>
+    </div>
+
+    <!-- Gradient Descent Optimization -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 05 - MATHEMATICAL CORE</div>
+            <h2>Gradient Descent Optimization</h2>
+        </div>
+        <div class="slide-body">
+            <p>Gradient Descent iteratively updates weight parameter vector by stepping opposite to the loss gradient:</p>
+            <div class="formula">
+                θ<sub>t+1</sub> = θ<sub>t</sub> - α ∇J(θ<sub>t</sub>)
+            </div>
+            <div class="grid-3" style="margin-top: 20px;">
+                <div class="card">
+                    <strong>Learning Rate (α):</strong> Controls the step size along the gradient curve per iteration.
+                </div>
+                <div class="card">
+                    <strong>Stochastic & Mini-Batch:</strong> Computes gradients on random data subsets to accelerate training convergence.
+                </div>
+                <div class="card">
+                    <strong>Adaptive Optimizers:</strong> Adam and RMSprop dynamically scale learning rates based on historical gradient moments.
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 21</span>
+        </div>
+    </div>
+
+    <!-- Section 06 Header -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 06</div>
+            <h2>Model Evaluation</h2>
+        </div>
+        <div class="slide-body" style="justify-content: center;">
+            <p style="font-size: 1.4rem;">
+                Rigorous benchmarking techniques, validation splits, performance metrics, and error analysis.
+            </p>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 22</span>
+        </div>
+    </div>
+
+    <!-- Model Metrics Comparison -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 06 - MODEL EVALUATION</div>
+            <h2>Model Metrics Comparison</h2>
+        </div>
+        <div class="slide-body">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Mathematical Formula</th>
+                        <th>Primary Best Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Accuracy</strong></td>
+                        <td>(TP+TN)/(TP+TN+FP+FN)</td>
+                        <td>Balanced datasets with equal class ratios.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Precision</strong></td>
+                        <td>TP/(TP+FP)</td>
+                        <td>Minimizing false positives (e.g., Email Spam Filter).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Recall (Sensitivity)</strong></td>
+                        <td>TP/(TP+FN)</td>
+                        <td>Minimizing false negatives (e.g., Cancer Screening).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>F1-Score</strong></td>
+                        <td>2 * (Precision * Recall) / (Precision + Recall)</td>
+                        <td>Imbalanced class distributions requiring harmony.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 23</span>
+        </div>
+    </div>
+
+    <!-- Confusion Matrix Breakdown -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 06 - MODEL EVALUATION</div>
+            <h2>Confusion Matrix Breakdown</h2>
+        </div>
+        <div class="slide-body grid-2">
+            <div class="grid-2">
+                <div class="card" style="border-color: #2ea44f;">
+                    <div style="color: #2ea44f; font-weight: bold;">True Positives</div>
+                    <div style="font-size: 1.8rem;">70%</div>
+                </div>
+                <div class="card" style="border-color: #da3633;">
+                    <div style="color: #da3633; font-weight: bold;">False Positives</div>
+                    <div style="font-size: 1.8rem;">10%</div>
+                </div>
+                <div class="card" style="border-color: #da3633;">
+                    <div style="color: #da3633; font-weight: bold;">False Negatives</div>
+                    <div style="font-size: 1.8rem;">12%</div>
+                </div>
+                <div class="card" style="border-color: #2ea44f;">
+                    <div style="color: #2ea44f; font-weight: bold;">True Negatives</div>
+                    <div style="font-size: 1.8rem;">8%</div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center;">
+                <p class="card">
+                    Confusion matrix analysis exposes specific error distributions beyond high-level accuracy metrics, allowing developers to optimize thresholds for precision or recall based on business goals.
+                </p>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 24</span>
+        </div>
+    </div>
+
+    <!-- Training vs Validation Loss -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 06 - MODEL EVALUATION</div>
+            <h2>Training vs Validation Loss</h2>
+        </div>
+        <div class="slide-body">
+            <div class="grid-4" style="margin-bottom: 20px;">
+                <div class="card"><strong>Epoch 1:</strong> Initial training</div>
+                <div class="card"><strong>Epoch 10:</strong> Convergence</div>
+                <div class="card card-highlight"><strong>Epoch 20:</strong> Optimal Point</div>
+                <div class="card" style="border-color: #da3633;"><strong>Epoch 30-40:</strong> Overfitting</div>
+            </div>
+            <div class="card">
+                <p>Divergence between Training Loss (Blue) and Validation Loss (Red) after Epoch 20 signals Overfitting.</p>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 25</span>
+        </div>
+    </div>
+
+    <!-- Section 07 Header -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 07</div>
+            <h2>Deep Learning & Vision</h2>
+        </div>
+        <div class="slide-body" style="justify-content: center;">
+            <p style="font-size: 1.4rem;">
+                Artificial neural networks, convolutional processing, transformer architecture, and future AI frontiers.
+            </p>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 26</span>
+        </div>
+    </div>
+
+    <!-- Deep Learning Domains -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 07 - DEEP LEARNING</div>
+            <h2>Deep Learning Domains</h2>
+        </div>
+        <div class="slide-body grid-3">
+            <div class="card">
+                <h3>Computer Vision</h3>
+                <p>CNNs and Vision Transformers process images for detection and autonomous navigation.</p>
+            </div>
+            <div class="card">
+                <h3>Natural Language Processing</h3>
+                <p>Transformer self-attention models power contextual language translation and generation.</p>
+            </div>
+            <div class="card">
+                <h3>Generative AI</h3>
+                <p>Diffusion models and autoregressive transformers create novel synthetic content across modalities.</p>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 27</span>
+        </div>
+    </div>
+
+    <!-- ML Pipeline Lifecycle -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 07 - DEEP LEARNING</div>
+            <h2>ML Pipeline Lifecycle</h2>
+        </div>
+        <div class="slide-body grid-4">
+            <div class="pipeline-step">
+                <div class="step-num">01</div>
+                <h3>Data Ingestion</h3>
+                <p style="font-size: 0.85rem; margin-top: 5px;">Feature extraction, cleaning, handling missing values, and normalization.</p>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-num">02</div>
+                <h3>Model Training</h3>
+                <p style="font-size: 0.85rem; margin-top: 5px;">Hyperparameter tuning, cross-validation, loss convergence tracking.</p>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-num">03</div>
+                <h3>Evaluation</h3>
+                <p style="font-size: 0.85rem; margin-top: 5px;">Fairness auditing, stress testing, precision-recall optimization.</p>
+            </div>
+            <div class="pipeline-step">
+                <div class="step-num">04</div>
+                <h3>Deployment</h3>
+                <p style="font-size: 0.85rem; margin-top: 5px;">Containerization, REST API serving, continuous monitoring for drift.</p>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 28</span>
+        </div>
+    </div>
+
+    <!-- The Horizon of Modern AI -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">SECTION 07 - DEEP LEARNING</div>
+            <h2>The Horizon of Modern AI</h2>
+        </div>
+        <div class="slide-body" style="justify-content: center; text-align: center;">
+            <p style="font-size: 1.5rem; max-width: 800px; margin: 0 auto; color: var(--accent-cyan);">
+                As machine learning algorithms scale with computational compute and multimodal architectures, machine intelligence is rapidly transforming every industry worldwide.
+            </p>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 29</span>
+        </div>
+    </div>
+
+    <!-- Conclusion Slide -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="section-tag">CONCLUSION</div>
+            <h2>Questions & Discussion</h2>
+        </div>
+        <div class="slide-body" style="justify-content: center; text-align: center;">
+            <p style="font-size: 1.3rem;">Thank you for exploring the foundations of Machine Learning.</p>
+            <p style="color: var(--text-muted); margin-top: 10px;">Machine Learning Masterclass Series</p>
+        </div>
+        <div class="slide-footer">
+            <span>Machine Learning Masterclass Series</span>
+            <span>Slide 30</span>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
+"""
+
+# Save to index.html file
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+print("index.html created successfully.")
